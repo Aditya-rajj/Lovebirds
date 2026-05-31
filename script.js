@@ -1,14 +1,24 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getDatabase, ref, push, onValue, set, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+// YOU MUST PASTE YOUR FIREBASE CONFIG HERE IN STEP 4!
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const SECRET_KEY = "1234";
 let currentUser = "";
 let partnerName = "";
-let pollInterval;
-let presenceInterval;
-
-// Core Engine Variables
-let processedMessages = new Set(); // Tracks all loaded messages so we never duplicate
-let locallySentMessages = []; // Prevents your own sent messages from double-rendering
-let partnerLastSeenTime = 0; 
-let isPartnerTyping = false;
-let typingTimeout;
 
 // DOM Elements
 const screenProfile = document.getElementById('screen-profile');
@@ -16,35 +26,34 @@ const screenAuth = document.getElementById('screen-auth');
 const screenChat = document.getElementById('screen-chat');
 const chatBox = document.getElementById('chat-box');
 const otpInputs = document.querySelectorAll('.otp-input');
-const statusText = document.querySelector('.status-text');
-const typingIndicator = document.getElementById('typing-indicator');
-const typingGlow = document.getElementById('typing-glow');
+const statusText = document.getElementById('status-text');
 const messageInput = document.getElementById('message-input');
+const typingIndicator = document.getElementById('typing-indicator');
 
-// Time Formatter for WhatsApp style timestamps
+// Format Timestamps (WhatsApp Style)
 function formatTime(ms) {
+  if (!ms) return '';
   const date = new Date(ms);
   let hours = date.getHours();
   let minutes = date.getMinutes();
   const ampm = hours >= 12 ? 'PM' : 'AM';
-  hours = hours % 12;
-  hours = hours ? hours : 12; 
+  hours = hours % 12 || 12;
   minutes = minutes < 10 ? '0' + minutes : minutes;
   return `${hours}:${minutes} ${ampm}`;
 }
 
 // 1. Profile Selection
-function selectProfile(name) {
+window.selectProfile = (name) => {
   currentUser = name;
-  partnerName = name === 'Aditya' ? 'Sharu' : 'Aditya';
+  partnerName = name === 'Aditya' ? 'Shalu' : 'Aditya';
   document.getElementById('verify-name').innerText = name;
-  document.getElementById('verify-profile-img').src = `https://api.dicebear.com/7.x/initials/svg?seed=${name}&backgroundColor=000000&textColor=ffffff`;
-  otpInputs.forEach(input => input.value = '');
+  document.getElementById('verify-profile-img').src = name === 'Aditya' ? 'aditya.jpg' : 'shalu.png';
+  otpInputs.forEach(i => i.value = '');
   switchScreen(screenProfile, screenAuth);
   setTimeout(() => otpInputs[0].focus(), 100);
-}
+};
 
-function goBackToProfile() { switchScreen(screenAuth, screenProfile); }
+window.goBackToProfile = () => switchScreen(screenAuth, screenProfile);
 
 // 2. OTP Logic
 otpInputs.forEach((input, index) => {
@@ -55,227 +64,160 @@ otpInputs.forEach((input, index) => {
   });
   input.addEventListener('input', () => {
     if (input.value && index < otpInputs.length - 1) otpInputs[index + 1].focus();
-    if (index === otpInputs.length - 1 && input.value !== '') verifyCode();
+    if (index === otpInputs.length - 1 && input.value !== '') window.verifyCode();
   });
 });
 
-// 3. Verification
-async function verifyCode() {
+window.verifyCode = () => {
   let enteredCode = Array.from(otpInputs).map(i => i.value).join('');
-  try {
-    const res = await fetch('/api/auth', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: enteredCode })
-    });
-    const data = await res.json();
-    
-    if (data.success) {
-      document.getElementById('chat-partner-name').innerText = partnerName;
-      switchScreen(screenAuth, screenChat);
-      
-      // Load History immediately and start polling
-      fetchMessages();
-      pollInterval = setInterval(fetchMessages, 3000);
-      
-      // Ping presence
-      sendMetaStatus('ONLINE');
-      presenceInterval = setInterval(() => sendMetaStatus('ONLINE'), 20000);
-    } else { triggerShake(); }
-  } catch (err) { triggerShake(); }
-}
-
-function triggerShake() {
-  const authCard = document.querySelector('.auth-card');
-  authCard.style.animation = "none";
-  authCard.offsetHeight; 
-  authCard.style.animation = "shake 0.4s";
-  otpInputs.forEach(input => input.value = '');
-  otpInputs[0].focus();
-}
-
-// 4. Meta Statuses (Typing / Online)
-async function sendMetaStatus(type) {
-  try {
-    await fetch('/api/chat', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: "", sender: currentUser, isMeta: type })
-    });
-  } catch (err) {}
-}
-
-let lastTypingTime = 0;
-messageInput.addEventListener('input', () => {
-  const textLen = messageInput.value.trim().length;
-  typingGlow.classList.toggle('active', textLen > 0);
-  if (textLen > 0 && Date.now() - lastTypingTime > 3000) {
-    sendMetaStatus('TYPING');
-    lastTypingTime = Date.now();
+  if (enteredCode === SECRET_KEY) {
+    document.getElementById('chat-partner-name').innerText = partnerName;
+    switchScreen(screenAuth, screenChat);
+    startChatEngine();
+  } else {
+    const authCard = document.querySelector('.auth-card');
+    authCard.style.animation = "none";
+    authCard.offsetHeight; 
+    authCard.style.animation = "shake 0.4s";
+    otpInputs.forEach(i => i.value = '');
+    otpInputs[0].focus();
   }
-});
+};
 
-// 5. Sending Messages
-async function sendMessage() {
+// 3. The Firebase Chat Engine
+function startChatEngine() {
+  // Listen for Messages
+  const messagesRef = ref(db, 'messages');
+  onValue(messagesRef, (snapshot) => {
+    chatBox.innerHTML = ''; // Clear box
+    const data = snapshot.val();
+    if (data) {
+      Object.values(data).forEach(msg => {
+        const type = msg.sender === currentUser ? 'sent' : 'received';
+        displayMessage(msg.text, msg.image, type, msg.timestamp);
+      });
+    }
+    chatBox.appendChild(typingIndicator); // Keep indicator at bottom
+    scrollToBottom();
+  });
+
+  // Manage Online/Offline Presence
+  const myPresenceRef = ref(db, `presence/${currentUser}`);
+  const partnerPresenceRef = ref(db, `presence/${partnerName}`);
+
+  set(myPresenceRef, { online: true, typing: false, lastSeen: serverTimestamp() });
+  onDisconnect(myPresenceRef).set({ online: false, typing: false, lastSeen: serverTimestamp() });
+
+  // Listen to Partner's Presence
+  onValue(partnerPresenceRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      updateLastSeenUI(data.online, data.lastSeen, data.typing);
+    } else {
+      updateLastSeenUI(false, null, false);
+    }
+  });
+}
+
+function updateLastSeenUI(isOnline, lastSeen, isTyping) {
+  if (isTyping) {
+    statusText.innerText = "typing...";
+    statusText.style.color = "#4caf50";
+    typingIndicator.classList.remove('hidden');
+    scrollToBottom();
+  } else {
+    typingIndicator.classList.add('hidden');
+    if (isOnline) {
+      statusText.innerText = "Online";
+      statusText.style.color = "#4caf50";
+    } else {
+      statusText.innerText = lastSeen ? `Last seen at ${formatTime(lastSeen)}` : "Offline";
+      statusText.style.color = "#a8a8a8";
+    }
+  }
+}
+
+// 4. Sending Messages
+window.sendMessage = () => {
   const text = messageInput.value.trim();
   if (!text) return;
-  
   messageInput.value = '';
-  typingGlow.classList.remove('active');
+  set(ref(db, `presence/${currentUser}/typing`), false); // stop typing
   
-  // Track this so we don't render it twice when it fetches back from Telegram
-  locallySentMessages.push(text);
-  displayMessage(text, "sent", formatTime(Date.now()));
+  push(ref(db, 'messages'), {
+    sender: currentUser,
+    text: text,
+    image: null,
+    timestamp: Date.now()
+  });
+};
 
-  try {
-    await fetch('/api/chat', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, sender: currentUser, isMeta: false })
-    });
-  } catch(err) {}
-}
+// Typing indicator logic
+let typingTimeout;
+messageInput.addEventListener('input', () => {
+  set(ref(db, `presence/${currentUser}/typing`), true);
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => {
+    set(ref(db, `presence/${currentUser}/typing`), false);
+  }, 2000);
+});
+messageInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') window.sendMessage();
+});
 
-async function sendPhoto(event) {
+// 5. Sending & Compressing Images
+window.sendPhoto = (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = async function(e) {
-    displayMessage("🖼️ Image sent...", "sent", formatTime(Date.now())); 
-    try {
-      await fetch('/api/upload', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ imageBase64: e.target.result, sender: currentUser })
-      });
-    } catch(err) {}
-  };
   reader.readAsDataURL(file);
-}
-
-// 6. Fetching Chat History (FIXED: Offset=0 keeps history for offline partner)
-async function fetchMessages() {
-  try {
-    // Sending offset=0 tells Telegram NOT to delete messages, holding them for 24h
-    const response = await fetch(`/api/chat?offset=0`);
-    const data = await response.json();
-    
-    if (data.ok && data.result.length > 0) {
-      // Sort messages chronologically just in case
-      data.result.sort((a, b) => a.message.date - b.message.date);
-
-      data.result.forEach(update => {
-        if (!update.message) return;
-        
-        // Skip messages we already loaded to prevent looping UI
-        const msgId = update.message.message_id;
-        if (processedMessages.has(msgId)) return;
-        processedMessages.add(msgId);
-        
-        let text = update.message.text || update.message.caption || "";
-        let timestamp = update.message.date * 1000;
-        
-        if (text.startsWith("[")) {
-          let closingBracket = text.indexOf("]");
-          let senderRaw = text.substring(1, closingBracket);
-          
-          if (text.startsWith("[META_")) {
-            handleMetaMessage(text, timestamp);
-          } else {
-            const actualMessage = text.substring(closingBracket + 1).trim();
-            const timeStr = formatTime(timestamp);
-            
-            // Log Last Seen if message is from Partner
-            if (senderRaw === partnerName) {
-              if (timestamp > partnerLastSeenTime) partnerLastSeenTime = timestamp;
-              
-              if(update.message.photo) {
-                displayMessage("🖼️ " + actualMessage, "received", timeStr);
-              } else {
-                displayMessage(actualMessage, "received", timeStr);
-              }
-            } 
-            // Render our own historical messages (cross-device support)
-            else if (senderRaw === currentUser) {
-              // Ignore if we just sent it on this specific screen
-              const localIdx = locallySentMessages.indexOf(actualMessage);
-              if (localIdx > -1) {
-                locallySentMessages.splice(localIdx, 1);
-              } else {
-                if(update.message.photo) {
-                  displayMessage("🖼️ " + actualMessage, "sent", timeStr);
-                } else {
-                  displayMessage(actualMessage, "sent", timeStr);
-                }
-              }
-            }
-          }
-        }
-      });
-      updateLastSeenUI();
-    }
-  } catch (error) {}
-}
-
-function handleMetaMessage(text, timestamp) {
-  const parts = text.replace("[", "").replace("]", "").split("_");
-  if(parts.length < 3) return;
-  const type = parts[1];
-  const sender = parts[2];
-
-  if (sender === partnerName) {
-    if (timestamp > partnerLastSeenTime) partnerLastSeenTime = timestamp; 
-    
-    if (type === 'TYPING') {
-      isPartnerTyping = true;
-      typingIndicator.classList.remove('hidden');
-      scrollToBottom();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.src = e.target.result;
+    img.onload = () => {
+      // Compress image so database runs fast
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 800;
+      let width = img.width;
+      let height = img.height;
+      if (width > MAX_WIDTH) {
+        height = Math.round((height * MAX_WIDTH) / width);
+        width = MAX_WIDTH;
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
       
-      clearTimeout(typingTimeout);
-      typingTimeout = setTimeout(() => {
-        isPartnerTyping = false;
-        typingIndicator.classList.add('hidden');
-        updateLastSeenUI();
-      }, 3000);
-    }
-  }
-}
+      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
 
-// 7. Last Seen Logic (FIXED: Calculates from history properly)
-function updateLastSeenUI() {
-  if (isPartnerTyping) {
-    statusText.innerText = "typing...";
-    statusText.style.color = "#4caf50";
-    return;
-  }
+      push(ref(db, 'messages'), {
+        sender: currentUser,
+        text: "",
+        image: compressedBase64,
+        timestamp: Date.now()
+      });
+    };
+  };
+};
 
-  if (partnerLastSeenTime === 0) {
-    statusText.innerText = "Offline";
-    statusText.style.color = "#888888";
-    return;
-  }
-
-  const secondsSinceLastSeen = (Date.now() - partnerLastSeenTime) / 1000;
-  
-  if (secondsSinceLastSeen < 45) { // 45 sec buffer for online status
-    statusText.innerText = "Online";
-    statusText.style.color = "#4caf50"; 
-  } else {
-    statusText.innerText = `Last seen at ${formatTime(partnerLastSeenTime)}`;
-    statusText.style.color = "#a8a8a8";
-  }
-}
-
-setInterval(() => {
-  if (partnerLastSeenTime > 0) updateLastSeenUI();
-}, 20000);
-
-// 8. UI Rendering (FIXED: Supports WhatsApp timestamps)
-function displayMessage(text, type, timeStr) {
+// 6. UI Rendering
+function displayMessage(text, imageBase64, type, timestamp) {
   const msgDiv = document.createElement('div');
   msgDiv.className = `message ${type}`;
-  
-  // HTML layout for message + timestamp
-  msgDiv.innerHTML = `
-    <span>${text}</span>
-    <span class="msg-time">${timeStr}</span>
-  `;
-  
+
+  let content = '';
+  if (imageBase64) {
+    content += `<img src="${imageBase64}" class="chat-image" onclick="window.open('${imageBase64}')">`;
+  }
+  if (text) {
+    content += `<span style="margin-bottom: 2px;">${text}</span>`;
+  }
+  content += `<span class="msg-time">${formatTime(timestamp)}</span>`;
+
+  msgDiv.innerHTML = content;
   chatBox.insertBefore(msgDiv, typingIndicator);
-  scrollToBottom();
 }
 
 function scrollToBottom() { setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50); }
@@ -285,26 +227,7 @@ function switchScreen(hideElement, showElement) {
   showElement.classList.add('active');
 }
 
-function logout() {
-  clearInterval(pollInterval);
-  clearInterval(presenceInterval);
-  
-  // Wipe session memory so logging in as the other person works properly
-  processedMessages.clear();
-  partnerLastSeenTime = 0;
-  chatBox.innerHTML = `
-    <div id="typing-indicator" class="typing-indicator-wrapper hidden">
-      <div class="typing-bubble">
-        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-      </div>
-    </div>
-  `; 
-  
-  typingGlow.classList.remove('active');
-  switchScreen(screenChat, screenProfile);
-}
-
-document.getElementById('message-input').addEventListener('keypress', function (e) {
-  if (e.key === 'Enter') sendMessage();
-});
-          
+window.logout = () => {
+  set(ref(db, `presence/${currentUser}/online`), false);
+  window.location.reload(); // Hard reset to clear memory
+};
