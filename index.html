@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoveBirds</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div id="screen-profile" class="screen active">
+    <div class="header-logo animate-entry">
+      <h1 class="brand-logo">LoveBirds</h1>
+      <p class="auth-subtitle">Select your profile to continue</p>
+    </div>
+    
+    <div class="profile-container">
+      <div class="profile-card stagger-1" onclick="selectProfile('Aditya')">
+        <div class="avatar-ring">
+          <img src="aditya.jpg" alt="Aditya" class="profile-img">
+        </div>
+        <h3>Aditya</h3>
+      </div>
+      <div class="profile-card stagger-2" onclick="selectProfile('Saaru')">
+        <div class="avatar-ring">
+          <img src="shalu.png" alt="Sharu" class="profile-img">
+        </div>
+        <h3>Sharu</h3>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-auth" class="screen">
+    <div class="auth-card animate-entry">
+      
+      <button class="back-btn" onclick="goBackToProfile()">
+        <i class="fa-solid fa-chevron-left"></i> BACK
+      </button>
+
+      <div class="user-greeting-section">
+        <div class="avatar-ring-large">
+          <img id="verify-profile-img" src="" alt="Profile" class="profile-img-large">
+        </div>
+        <h2 class="greeting-text">Hey! <span id="verify-name">Name</span></h2>
+        <p class="auth-subtitle">Please enter verification code<br>to access your space.</p>
+      </div>
+      
+      <div class="otp-container">
+        <input type="password" maxlength="1" class="otp-input" autocomplete="off">
+        <input type="password" maxlength="1" class="otp-input" autocomplete="off">
+        <input type="password" maxlength="1" class="otp-input" autocomplete="off">
+        <input type="password" maxlength="1" class="otp-input" autocomplete="off">
+      </div>
+      
+      <button id="verify-btn" onclick="verifyCode()">VERIFY</button>
+    </div>
+  </div>
+
+  <div id="screen-chat" class="screen">
+    <div class="chat-container animate-entry">
+      
+      <div class="chat-header">
+        <div class="header-info">
+          <h3 id="chat-partner-name">Partner</h3>
+          <span class="status-text">Connecting...</span>
+        </div>
+        <button onclick="logout()" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+      </div>
+
+      <div class="messages-container" id="chat-box"></div>
+
+      <div id="typing-indicator" class="typing-indicator-wrapper hidden">
+        <div class="typing-bubble">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <div class="typing-gradient-bg" id="typing-glow"></div>
+        <div class="input-area">
+          <label for="file-upload" class="icon-button">
+            <i class="fa-solid fa-image"></i>
+          </label>
+          <input type="file" id="file-upload" accept="image/*" style="display: none;" onchange="sendPhoto(event)">
+          <input type="text" id="message-input" class="chat-input" placeholder="Message..." autocomplete="off">
+          <button class="icon-button" onclick="sendMessage()">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
