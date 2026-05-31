@@ -19,13 +19,13 @@
     <div class="profile-container">
       <div class="profile-card stagger-1" onclick="window.selectProfile('Aditya')">
         <div class="avatar-ring">
-          <img src="aditya.jpg" alt="Aditya" class="profile-img" onerror="this.src='https://ui-avatars.com/api/?name=Aditya&background=ffffff&color=000000'">
+          <img src="aditya.jpg" alt="Aditya" class="profile-img" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=Aditya&backgroundColor=000000&textColor=ffffff'">
         </div>
         <h3>Aditya</h3>
       </div>
       <div class="profile-card stagger-2" onclick="window.selectProfile('Shalu')">
         <div class="avatar-ring">
-          <img src="shalu.png" alt="Shalu" class="profile-img" onerror="this.src='https://ui-avatars.com/api/?name=Shalu&background=ffffff&color=000000'">
+          <img src="shalu.png" alt="Shalu" class="profile-img" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=Shalu&backgroundColor=000000&textColor=ffffff'">
         </div>
         <h3>Shalu</h3>
       </div>
@@ -34,7 +34,6 @@
 
   <div id="screen-auth" class="screen">
     <div class="auth-card animate-entry">
-      
       <button class="back-btn" onclick="window.goBackToProfile()">
         <i class="fa-solid fa-chevron-left"></i> BACK
       </button>
@@ -44,14 +43,14 @@
           <img id="verify-profile-img" src="" alt="Profile" class="profile-img-large">
         </div>
         <h2 class="greeting-text">Hey! <span id="verify-name">Name</span></h2>
-        <p class="auth-subtitle">Please enter verification code<br>to access your space.</p>
+        <p class="auth-subtitle">Enter your 4-digit space key.</p>
       </div>
       
       <div class="otp-container">
-        <input type="password" maxlength="1" class="otp-input" autocomplete="off">
-        <input type="password" maxlength="1" class="otp-input" autocomplete="off">
-        <input type="password" maxlength="1" class="otp-input" autocomplete="off">
-        <input type="password" maxlength="1" class="otp-input" autocomplete="off">
+        <input type="password" maxlength="1" class="otp-input" autocomplete="off" inputmode="numeric">
+        <input type="password" maxlength="1" class="otp-input" autocomplete="off" inputmode="numeric">
+        <input type="password" maxlength="1" class="otp-input" autocomplete="off" inputmode="numeric">
+        <input type="password" maxlength="1" class="otp-input" autocomplete="off" inputmode="numeric">
       </div>
       
       <button id="verify-btn" onclick="window.verifyCode()">VERIFY</button>
@@ -59,7 +58,7 @@
   </div>
 
   <div id="screen-chat" class="screen">
-    <div class="chat-container animate-entry">
+    <div class="chat-container">
       
       <div class="chat-header">
         <div class="header-info">
@@ -89,8 +88,12 @@
           </button>
         </div>
       </div>
-
     </div>
+  </div>
+
+  <div id="image-modal" class="modal" onclick="window.closeModal()">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="expanded-img">
   </div>
 
   <script type="module" src="script.js"></script>
