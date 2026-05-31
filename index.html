@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>LoveBirds</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,13 +19,13 @@
     <div class="profile-container">
       <div class="profile-card stagger-1" onclick="selectProfile('Aditya')">
         <div class="avatar-ring">
-          <img src="aditya.jpg" alt="Aditya" class="profile-img">
+          <img src="https://api.dicebear.com/7.x/initials/svg?seed=Aditya&backgroundColor=000000&textColor=ffffff" alt="Aditya" class="profile-img">
         </div>
         <h3>Aditya</h3>
       </div>
-      <div class="profile-card stagger-2" onclick="selectProfile('Saaru')">
+      <div class="profile-card stagger-2" onclick="selectProfile('Sharu')">
         <div class="avatar-ring">
-          <img src="shalu.png" alt="Sharu" class="profile-img">
+          <img src="https://api.dicebear.com/7.x/initials/svg?seed=Sharu&backgroundColor=000000&textColor=ffffff" alt="Sharu" class="profile-img">
         </div>
         <h3>Sharu</h3>
       </div>
@@ -64,16 +64,16 @@
       <div class="chat-header">
         <div class="header-info">
           <h3 id="chat-partner-name">Partner</h3>
-          <span class="status-text">Connecting...</span>
+          <span class="status-text">Fetching history...</span>
         </div>
         <button onclick="logout()" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
       </div>
 
-      <div class="messages-container" id="chat-box"></div>
-
-      <div id="typing-indicator" class="typing-indicator-wrapper hidden">
-        <div class="typing-bubble">
-          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <div class="messages-container" id="chat-box">
+        <div id="typing-indicator" class="typing-indicator-wrapper hidden">
+          <div class="typing-bubble">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
         </div>
       </div>
 
