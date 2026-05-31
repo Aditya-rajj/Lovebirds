@@ -17,17 +17,17 @@
     </div>
     
     <div class="profile-container">
-      <div class="profile-card stagger-1" onclick="selectProfile('Aditya')">
+      <div class="profile-card stagger-1" onclick="window.selectProfile('Aditya')">
         <div class="avatar-ring">
-          <img src="https://api.dicebear.com/7.x/initials/svg?seed=Aditya&backgroundColor=000000&textColor=ffffff" alt="Aditya" class="profile-img">
+          <img src="aditya.jpg" alt="Aditya" class="profile-img" onerror="this.src='https://ui-avatars.com/api/?name=Aditya&background=ffffff&color=000000'">
         </div>
         <h3>Aditya</h3>
       </div>
-      <div class="profile-card stagger-2" onclick="selectProfile('Sharu')">
+      <div class="profile-card stagger-2" onclick="window.selectProfile('Shalu')">
         <div class="avatar-ring">
-          <img src="https://api.dicebear.com/7.x/initials/svg?seed=Sharu&backgroundColor=000000&textColor=ffffff" alt="Sharu" class="profile-img">
+          <img src="shalu.png" alt="Shalu" class="profile-img" onerror="this.src='https://ui-avatars.com/api/?name=Shalu&background=ffffff&color=000000'">
         </div>
-        <h3>Sharu</h3>
+        <h3>Shalu</h3>
       </div>
     </div>
   </div>
@@ -35,7 +35,7 @@
   <div id="screen-auth" class="screen">
     <div class="auth-card animate-entry">
       
-      <button class="back-btn" onclick="goBackToProfile()">
+      <button class="back-btn" onclick="window.goBackToProfile()">
         <i class="fa-solid fa-chevron-left"></i> BACK
       </button>
 
@@ -54,7 +54,7 @@
         <input type="password" maxlength="1" class="otp-input" autocomplete="off">
       </div>
       
-      <button id="verify-btn" onclick="verifyCode()">VERIFY</button>
+      <button id="verify-btn" onclick="window.verifyCode()">VERIFY</button>
     </div>
   </div>
 
@@ -64,9 +64,9 @@
       <div class="chat-header">
         <div class="header-info">
           <h3 id="chat-partner-name">Partner</h3>
-          <span class="status-text">Fetching history...</span>
+          <span class="status-text" id="status-text">Connecting...</span>
         </div>
-        <button onclick="logout()" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+        <button onclick="window.logout()" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
       </div>
 
       <div class="messages-container" id="chat-box">
@@ -78,14 +78,13 @@
       </div>
 
       <div class="input-container">
-        <div class="typing-gradient-bg" id="typing-glow"></div>
         <div class="input-area">
           <label for="file-upload" class="icon-button">
             <i class="fa-solid fa-image"></i>
           </label>
-          <input type="file" id="file-upload" accept="image/*" style="display: none;" onchange="sendPhoto(event)">
+          <input type="file" id="file-upload" accept="image/*" style="display: none;" onchange="window.sendPhoto(event)">
           <input type="text" id="message-input" class="chat-input" placeholder="Message..." autocomplete="off">
-          <button class="icon-button" onclick="sendMessage()">
+          <button class="icon-button" onclick="window.sendMessage()">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
         </div>
@@ -94,6 +93,6 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
