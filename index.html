@@ -6,39 +6,49 @@
   <title>LoveBirds</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="dark-mode">
 
   <div class="app-frame">
     <div class="pattern-bg"></div>
 
+    <!-- ===================== SCREEN 1: PROFILE SELECT ===================== -->
     <div id="screen-profile" class="screen active">
       <div class="header-logo bounce-in">
+        <div class="logo-heart">❤️</div>
         <h1 class="brand-logo">LoveBirds</h1>
-        <p class="auth-subtitle">Who is logging in?</p>
+        <p class="auth-subtitle">Who is logging in today?</p>
       </div>
       <div class="profile-container">
         <div class="profile-card neo-box bounce-in stagger-1" onclick="window.selectProfile('Aditya')">
+          <div class="profile-card-glow"></div>
           <img id="select-aditya-img" src="aditya.jpg" alt="Aditya" class="profile-img">
           <h3>Aditya</h3>
+          <span class="profile-card-sub">Tap to enter</span>
         </div>
         <div class="profile-card neo-box bounce-in stagger-2" onclick="window.selectProfile('Akanksha')">
+          <div class="profile-card-glow"></div>
           <img id="select-akanksha-img" src="akanksha.png" alt="Akanksha" class="profile-img">
           <h3>Akanksha</h3>
+          <span class="profile-card-sub">Tap to enter</span>
         </div>
       </div>
     </div>
 
+    <!-- ===================== SCREEN 2: AUTH ===================== -->
     <div id="screen-auth" class="screen">
       <div class="auth-card neo-box slide-up">
         <button class="back-btn" onclick="window.goBackToProfile()">
           <i class="fa-solid fa-arrow-left"></i> Back
         </button>
         <div class="user-greeting-section">
-          <img id="verify-profile-img" src="" alt="Profile" class="profile-img-large neo-border">
-          <h2 class="greeting-text">Hey, <span id="verify-name">Name</span>!</h2>
-          <p class="auth-subtitle">Enter your secret key.</p>
+          <div class="avatar-ring-wrap">
+            <img id="verify-profile-img" src="" alt="Profile" class="profile-img-large neo-border">
+            <div class="avatar-ring-pulse"></div>
+          </div>
+          <h2 class="greeting-text">Hey, <span id="verify-name" class="highlight-name">Name</span>! 👋</h2>
+          <p class="auth-subtitle">Enter your secret key to continue.</p>
         </div>
         <div class="otp-container">
           <input type="password" maxlength="1" class="otp-input neo-input" autocomplete="off" inputmode="numeric">
@@ -46,38 +56,44 @@
           <input type="password" maxlength="1" class="otp-input neo-input" autocomplete="off" inputmode="numeric">
           <input type="password" maxlength="1" class="otp-input neo-input" autocomplete="off" inputmode="numeric">
         </div>
-        <button id="verify-btn" class="neo-btn neo-btn-primary" onclick="window.verifyCode()">VERIFY</button>
+        <button id="verify-btn" class="neo-btn neo-btn-primary" onclick="window.verifyCode()">
+          <i class="fa-solid fa-unlock"></i> VERIFY
+        </button>
       </div>
     </div>
 
+    <!-- ===================== SCREEN 3: HOME ===================== -->
     <div id="screen-home" class="screen">
       <div class="home-container fade-in">
-        
+
+        <!-- Top Header -->
         <div class="home-header">
           <div class="profile-pill neo-box" onclick="document.getElementById('profile-pic-upload').click()">
             <img id="home-user-img" src="" alt="User" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=User'">
             <div class="pill-info">
-              <span id="home-user-name">Name</span>
+              <span id="home-user-name" class="pill-name">Name</span>
               <span class="pill-sub" id="home-status-text">Connecting...</span>
             </div>
-            <input type="file" id="profile-pic-upload" accept="image/*" style="display: none;" onchange="window.uploadProfilePic(event)">
+            <input type="file" id="profile-pic-upload" accept="image/*" style="display:none;" onchange="window.uploadProfilePic(event)">
           </div>
-          
+
           <div class="home-actions">
-            <button class="icon-button neo-box" onclick="window.openSettings()">
+            <button class="icon-button neo-box" onclick="window.openSettings()" title="Settings">
               <i class="fa-solid fa-gear"></i>
             </button>
-            <button class="icon-button neo-box relative-btn" onclick="window.goToChat()">
+            <button class="icon-button neo-box relative-btn" onclick="window.goToChat()" title="Messages">
               <i class="fa-solid fa-message"></i>
               <span id="unread-badge" class="unread-badge hidden">0</span>
             </button>
           </div>
         </div>
 
+        <!-- Title -->
         <div class="home-title-area">
-          <h2>Your Moments <br><span class="highlight">Together!</span> ✨</h2>
+          <h2>Your Moments<br><span class="highlight">Together!</span> ✨</h2>
         </div>
 
+        <!-- Nav Boxes -->
         <div class="nav-boxes-grid">
           <a href="#" class="nav-box neo-box">
             <div class="nav-icon" style="background: var(--primary-pink);">
@@ -93,69 +109,144 @@
           </a>
         </div>
 
-        <div class="feed-container" id="feed-container">
-          </div>
+        <!-- Feed -->
+        <div class="feed-container" id="feed-container"></div>
 
-        <button class="fab-btn neo-btn-primary" onclick="window.openCreatePost()">
+        <!-- FAB -->
+        <button class="fab-btn neo-btn-primary" onclick="window.openCreatePost()" title="Create Post">
           <i class="fa-solid fa-plus"></i>
         </button>
 
       </div>
     </div>
 
+    <!-- ===================== SCREEN 4: CREATE POST ===================== -->
     <div id="screen-create-post" class="screen">
       <div class="create-post-container">
-        
-        <div class="chat-header neo-box" style="border-radius: 0 0 20px 20px; margin-bottom: 15px;">
-          <div class="header-left">
-            <button class="icon-button header-icon-btn" onclick="window.closeCreatePost()">
-              <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <h3 style="font-size: 18px; font-weight: 800;">Create Post</h3>
-          </div>
-          <button class="neo-btn neo-btn-primary small-btn" style="padding: 8px 16px;" onclick="window.submitPost()">POST IT</button>
+
+        <!-- Header -->
+        <div class="create-post-header neo-box">
+          <button class="icon-button header-icon-btn" onclick="window.closeCreatePost()">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <h3 class="create-post-title">New Moment</h3>
+          <button class="neo-btn neo-btn-primary small-btn post-submit-btn" onclick="window.submitPost()">
+            <i class="fa-solid fa-paper-plane"></i> POST
+          </button>
         </div>
 
-        <div class="create-post-content fade-in">
+        <div class="create-post-scroll">
           <input type="file" id="post-image-upload" accept="image/*" style="display:none;" onchange="window.previewPostImage(event)">
-          
-          <div class="full-post-image-preview neo-box" onclick="document.getElementById('post-image-upload').click()">
-            <img id="post-preview-img" alt="" style="display:none;">
-            <div id="post-preview-placeholder">
-              <i class="fa-solid fa-camera"></i><br>Tap to add a photo
+
+          <!-- Image Picker -->
+          <div class="post-image-picker neo-box" id="post-image-picker-area" onclick="document.getElementById('post-image-upload').click()">
+            <img id="post-preview-img" alt="" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:14px;">
+            <div id="post-preview-placeholder" class="post-placeholder">
+              <div class="post-placeholder-icon">
+                <i class="fa-solid fa-camera-retro"></i>
+              </div>
+              <p class="post-placeholder-title">Add a Photo</p>
+              <p class="post-placeholder-sub">Tap here to pick from gallery</p>
+            </div>
+            <div id="post-change-photo-overlay" class="post-change-overlay" style="display:none;" onclick="document.getElementById('post-image-upload').click()">
+              <i class="fa-solid fa-camera"></i> Change Photo
             </div>
           </div>
-          
-          <textarea id="post-caption" class="post-caption-input neo-input" placeholder="Write a sweet caption..."></textarea>
-          
-          <h4 style="margin-bottom: 10px; font-size: 14px; font-weight: 800;">How are you feeling?</h4>
-          <div class="mood-selector">
-            <button class="mood-pill" onclick="window.selectMood('happy', this)">😊 Happy</button>
-            <button class="mood-pill" onclick="window.selectMood('loved', this)">❤️ Loved</button>
-            <button class="mood-pill" onclick="window.selectMood('excited', this)">✨ Excited</button>
-            <button class="mood-pill" onclick="window.selectMood('blessed', this)">😇 Blessed</button>
-            <button class="mood-pill" onclick="window.selectMood('silly', this)">🤪 Silly</button>
+
+          <!-- Caption Area -->
+          <div class="caption-wrapper neo-box">
+            <div class="caption-user-row">
+              <img id="create-post-avatar" src="" alt="" class="caption-avatar" onerror="this.style.display='none'">
+              <span id="create-post-username" class="caption-username"></span>
+            </div>
+            <textarea
+              id="post-caption"
+              class="caption-textarea"
+              placeholder="What's on your mind? 💭"
+              rows="3"
+              oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+            ></textarea>
+          </div>
+
+          <!-- Mood Selector -->
+          <div class="mood-section">
+            <div class="mood-section-header">
+              <i class="fa-solid fa-face-smile"></i>
+              <h4>How are you feeling?</h4>
+            </div>
+            <div class="mood-selector">
+              <button class="mood-pill" onclick="window.selectMood('happy', this)">😊 Happy</button>
+              <button class="mood-pill" onclick="window.selectMood('loved', this)">❤️ Loved</button>
+              <button class="mood-pill" onclick="window.selectMood('excited', this)">✨ Excited</button>
+              <button class="mood-pill" onclick="window.selectMood('blessed', this)">😇 Blessed</button>
+              <button class="mood-pill" onclick="window.selectMood('silly', this)">🤪 Silly</button>
+            </div>
           </div>
         </div>
 
       </div>
     </div>
 
+    <!-- ===================== SCREEN 5: COMMENTS ===================== -->
+    <div id="screen-comments" class="screen">
+      <div class="chat-container">
+
+        <!-- Comments Header -->
+        <div class="chat-header neo-box comments-header-bar">
+          <div class="header-left">
+            <button class="icon-button header-icon-btn" onclick="window.closeComments()">
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div class="header-info">
+              <h3 style="font-size:17px; font-weight:800;">Comments</h3>
+              <span id="comments-count-sub" class="comments-count-label">0 comments</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mini Post Preview (filled by JS) -->
+        <div id="comment-post-preview" class="comment-post-preview neo-box" style="display:none;"></div>
+
+        <!-- Comments List -->
+        <div class="messages-container comments-scroll-area" id="comments-box"></div>
+
+        <!-- Comment Input -->
+        <div class="input-container comments-input-wrap">
+          <div id="reply-indicator" class="reply-banner hidden">
+            <i class="fa-solid fa-reply reply-banner-icon"></i>
+            <span id="reply-label">Replying...</span>
+            <button class="reply-cancel-btn" onclick="window.cancelReply()">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div class="input-area neo-box comment-input-bar">
+            <img id="comments-user-avatar" src="" alt="" class="comment-input-avatar" onerror="this.style.display='none'">
+            <input type="text" id="comment-input" class="chat-input" placeholder="Add a comment..." autocomplete="off">
+            <button class="send-btn neo-btn-primary" onclick="window.sendComment()">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===================== SCREEN 6: CHAT ===================== -->
     <div id="screen-chat" class="screen">
       <div class="chat-container">
-        
+
         <div class="chat-header neo-box">
           <div class="header-left">
             <button class="icon-button header-icon-btn" onclick="window.goToHome()">
               <i class="fa-solid fa-arrow-left"></i>
             </button>
-            <img id="header-partner-img" src="" alt="Partner" class="header-avatar neo-border">
+            <div class="header-avatar-wrap">
+              <img id="header-partner-img" src="" alt="Partner" class="header-avatar neo-border">
+              <span id="status-dot" class="status-dot offline"></span>
+            </div>
             <div class="header-info">
               <h3 id="chat-partner-name">Partner</h3>
-              <div class="status-wrapper">
-                <span id="status-dot" class="status-dot offline"></span>
-                <span class="status-text" id="status-text">Connecting...</span>
-              </div>
+              <span class="status-text" id="status-text">Connecting...</span>
             </div>
           </div>
         </div>
@@ -172,22 +263,17 @@
 
         <div class="input-container">
           <div class="input-area neo-box">
-            
             <label for="file-upload" class="attach-btn" id="attach-btn" title="Send Photo">
               <i class="fa-solid fa-image"></i>
             </label>
-            <input type="file" id="file-upload" accept="image/*" style="display: none;" onchange="window.sendPhoto(event)">
-            
+            <input type="file" id="file-upload" accept="image/*" style="display:none;" onchange="window.sendPhoto(event)">
             <button id="record-btn" class="attach-btn" onclick="window.toggleRecording()" title="Send Voice Note">
               <i class="fa-solid fa-microphone"></i>
             </button>
-
             <input type="text" id="message-input" class="chat-input" placeholder="Type a message..." autocomplete="off">
-            
             <button id="text-send-btn" class="send-btn neo-btn-primary" onclick="window.sendMessage()">
               <i class="fa-solid fa-paper-plane"></i>
             </button>
-
             <div id="audio-preview-container" class="audio-preview-ui">
               <button class="icon-button trash-btn" onclick="window.cancelAudio()">
                 <i class="fa-solid fa-trash"></i>
@@ -197,45 +283,68 @@
                 <i class="fa-solid fa-paper-plane"></i>
               </button>
             </div>
-
           </div>
         </div>
 
       </div>
     </div>
 
+    <!-- ===================== ACTION SHEET MODAL (3-DOT MENU) ===================== -->
+    <div id="action-sheet-modal" class="modal-overlay" onclick="window.closeActionSheet()">
+      <div class="action-sheet-card neo-box" onclick="event.stopPropagation()">
+        <div class="action-sheet-handle"></div>
+        <div id="action-sheet-content"></div>
+        <button class="neo-btn neo-btn-secondary action-cancel-btn" onclick="window.closeActionSheet()">
+          <i class="fa-solid fa-xmark"></i> Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- ===================== SETTINGS MODAL ===================== -->
     <div id="settings-modal" class="modal-overlay" onclick="window.closeSettings()">
       <div class="custom-modal-card neo-box bounce-in" onclick="event.stopPropagation()">
         <button class="close-modal-btn" onclick="window.closeSettings()">
           <i class="fa-solid fa-xmark"></i>
         </button>
-        <h3 class="modal-title" style="margin-bottom: 5px;">Settings</h3>
-        
+        <h3 class="modal-title">⚙️ Settings</h3>
+
         <div class="settings-profile-area">
-          <img id="settings-profile-img" src="" class="profile-img-large neo-border" alt="Profile">
-          <button class="neo-btn neo-btn-secondary small-btn" onclick="document.getElementById('profile-pic-upload-settings').click()">
-            Change Picture
-          </button>
-          <input type="file" id="profile-pic-upload-settings" accept="image/*" style="display: none;" onchange="window.uploadProfilePic(event)">
+          <div class="settings-avatar-wrap">
+            <img id="settings-profile-img" src="" class="profile-img-large neo-border" alt="Profile">
+            <button class="settings-cam-btn" onclick="document.getElementById('profile-pic-upload-settings').click()">
+              <i class="fa-solid fa-camera"></i>
+            </button>
+          </div>
+          <input type="file" id="profile-pic-upload-settings" accept="image/*" style="display:none;" onchange="window.uploadProfilePic(event)">
+          <span id="settings-username-label" class="settings-name-label"></span>
         </div>
 
         <div class="settings-controls">
           <div class="setting-row">
-            <span>Dark Mode</span>
+            <div class="setting-row-label">
+              <i class="fa-solid fa-moon"></i>
+              <span>Dark Mode</span>
+            </div>
             <label class="neo-toggle">
               <input type="checkbox" id="setting-theme" onchange="window.saveSettings()">
               <span class="slider"></span>
             </label>
           </div>
           <div class="setting-row">
-            <span>Sound Effects</span>
+            <div class="setting-row-label">
+              <i class="fa-solid fa-volume-high"></i>
+              <span>Sound Effects</span>
+            </div>
             <label class="neo-toggle">
               <input type="checkbox" id="setting-sound" onchange="window.saveSettings()">
               <span class="slider"></span>
             </label>
           </div>
           <div class="setting-row">
-            <span>Vibration</span>
+            <div class="setting-row-label">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+              <span>Vibration</span>
+            </div>
             <label class="neo-toggle">
               <input type="checkbox" id="setting-vibration" onchange="window.saveSettings()">
               <span class="slider"></span>
@@ -243,28 +352,37 @@
           </div>
         </div>
 
-        <div class="modal-buttons dual-buttons" style="margin-top: 15px;">
+        <div class="modal-buttons dual-buttons" style="margin-top:15px;">
           <button class="neo-btn neo-btn-secondary" onclick="window.clearEntireChatHistory()">
-            Delete Chats
+            <i class="fa-solid fa-broom"></i> Delete Chats
           </button>
           <button class="neo-btn neo-btn-danger" onclick="window.showLogoutWarning()">
-            Log Out
+            <i class="fa-solid fa-right-from-bracket"></i> Log Out
           </button>
         </div>
       </div>
     </div>
 
+    <!-- ===================== CONFIRM MODAL ===================== -->
     <div id="confirm-modal" class="modal-overlay">
       <div class="custom-modal-card neo-box bounce-in">
+        <div class="confirm-icon-wrap">
+          <i class="fa-solid fa-triangle-exclamation confirm-icon"></i>
+        </div>
         <h3 id="confirm-title" class="modal-title">Are you sure?</h3>
         <p id="confirm-message" class="modal-text">Do you really want to do this?</p>
         <div class="modal-buttons dual-buttons">
-          <button class="neo-btn neo-btn-secondary" onclick="window.closeConfirm()">Cancel</button>
-          <button id="confirm-action-btn" class="neo-btn neo-btn-danger">Confirm</button>
+          <button class="neo-btn neo-btn-secondary" onclick="window.closeConfirm()">
+            <i class="fa-solid fa-xmark"></i> Cancel
+          </button>
+          <button id="confirm-action-btn" class="neo-btn neo-btn-danger">
+            <i class="fa-solid fa-check"></i> Confirm
+          </button>
         </div>
       </div>
     </div>
 
+    <!-- ===================== IMAGE LIGHTBOX ===================== -->
     <div id="image-modal" class="modal" onclick="window.closeImageModal()">
       <button class="close-lightbox-btn"><i class="fa-solid fa-xmark"></i></button>
       <img class="modal-content neo-border bounce-in" id="expanded-img" alt="">
